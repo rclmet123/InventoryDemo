@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>Car Inventory</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
@@ -17,8 +17,9 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Car Inventory", "Index", "Home", New With {.area = ""}, New With {.class = "navbar-brand"})
-               
+                <a class="navbar-brand">
+                    Car Inventory
+                </a>
             </div>
             <div Class="navbar-collapse collapse" style="float:right">
                 @If Not Session("UserName") Is Nothing Then
@@ -39,7 +40,7 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            <p>&copy; @DateTime.Now.Year - Car Inventory System</p>
         </footer>
     </div>
 
