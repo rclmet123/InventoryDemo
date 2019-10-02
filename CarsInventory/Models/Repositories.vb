@@ -13,7 +13,6 @@ Public Class Repositories(Of T As Class)
     End Sub
 
     Public Function GetAll(Optional predicate As Func(Of T, Boolean) = Nothing) As IEnumerable(Of T) Implements IGenericRepository(Of T).GetAll
-        ' Dim query As IQueryable(Of T) = dbSet
 
         If predicate IsNot Nothing Then
             Return dbSet.Where(predicate).ToList()
@@ -39,6 +38,5 @@ Public Class Repositories(Of T As Class)
         dbSet.Attach(entity)
         Me.context.Entry(entity).State = EntityState.Modified
     End Sub
-
 
 End Class

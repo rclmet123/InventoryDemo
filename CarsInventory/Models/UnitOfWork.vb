@@ -12,12 +12,6 @@ Public Class UnitOfWork
         entities = New CarsInventoryEntities()
     End Sub
 
-    'Public Function Repository(Of T As Class)() Implements IUnitOfWork.Repository(Of T)
-
-
-    '    Return New Repositories(Of T)(entities)
-    'End Function
-
     Public Sub SaveChanges() Implements IUnitOfWork.SaveChanges
 
         entities.SaveChanges()

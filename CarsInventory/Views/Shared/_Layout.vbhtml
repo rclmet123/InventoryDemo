@@ -28,11 +28,6 @@
                     </a>
                     @Html.ActionLink("Logout", "Logout", "Home", New With {.area = ""}, New With {.class = "navbar-brand"})
                 End If
-                @*<ul class="nav navbar-nav">
-            <li>@Html.ActionLink("Home", "Index", "Home")</li>
-            <li>@Html.ActionLink("About", "About", "Home")</li>
-            <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-        </ul>*@
             </div>
         </div>
     </div>
