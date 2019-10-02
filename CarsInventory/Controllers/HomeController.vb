@@ -3,25 +3,34 @@
 Public Class HomeController
     Inherits System.Web.Mvc.Controller
 
+    Private Shared ReadOnly log As log4net.ILog = log4net.LogManager.GetLogger(GetType(HomeController))
+
     Function Index(Brand As String, Model As String) As ActionResult
-        If Not Session("UserId") Is Nothing Then
 
-            Dim uom As New UnitOfWork
+        Try
+            If Not Session("UserId") Is Nothing Then
 
-            Dim data = uom.Repository(Of Car).GetAll().Where(Function(x) x.CreatedBy = CInt(Session("UserId")))
+                Dim uom As New UnitOfWork
 
-            'Check if filter exist then filter records
-            If Not Brand Is Nothing Then
-                data = data.Where(Function(x) x.Brand.ToLower().Contains(Brand.ToLower())).ToList()
+                Dim data = uom.Repository(Of Car).GetAll().Where(Function(x) x.CreatedBy = CInt(Session("UserId")))
+
+                'Check if filter exist then filter records
+                If Not Brand Is Nothing Then
+                    data = data.Where(Function(x) x.Brand.ToLower().Contains(Brand.ToLower())).ToList()
+                End If
+                If Not Model Is Nothing Then
+                    data = data.Where(Function(x) x.Model.ToLower().Contains(Model.ToLower())).ToList()
+                End If
+
+                Return View(data)
             End If
-            If Not Model Is Nothing Then
-                data = data.Where(Function(x) x.Model.ToLower().Contains(Model.ToLower())).ToList()
-            End If
 
-            Return View(data)
-        End If
+        Catch ex As Exception
+            log.Error(ex)
+        End Try
 
         Return RedirectToAction("Index", "Account")
+
     End Function
 
     Function Logout() As ActionResult
@@ -32,48 +41,62 @@ Public Class HomeController
     End Function
 
     Function SaveCar(id As Integer, brand As String, model As String, year As Integer, price As Decimal, isNew As Boolean) As ActionResult
+        Try
+            Dim uom As New UnitOfWork
 
-        Dim uom As New UnitOfWork
+            uom.BeginTransaction()
+            Dim dataModel As New Car
+            dataModel.Id = id
+            dataModel.Brand = brand
+            dataModel.Model = model
+            dataModel.Year = year
+            dataModel.Price = price
+            dataModel.IsNew = isNew
+            dataModel.CreatedBy = CInt(Session("UserId"))
 
-        uom.BeginTransaction()
-        Dim dataModel As New Car
-        dataModel.Id = id
-        dataModel.Brand = brand
-        dataModel.Model = model
-        dataModel.Year = year
-        dataModel.Price = price
-        dataModel.IsNew = isNew
-        dataModel.CreatedBy = CInt(Session("UserId"))
+            If (id > 0) Then
+                uom.Repository(Of Car).Update(dataModel)
+            Else
+                uom.Repository(Of Car).Add(dataModel)
+            End If
 
-        If (id > 0) Then
-            uom.Repository(Of Car).Update(dataModel)
-        Else
-            uom.Repository(Of Car).Add(dataModel)
-        End If
+            uom.SaveChanges()
 
-        uom.SaveChanges()
+            uom.CommitTransaction()
 
-        uom.CommitTransaction()
+            Return Json(True)
 
-        Return Json(True)
+        Catch ex As Exception
+            log.Error(ex)
+        End Try
+
+        Return Json(False)
+
     End Function
 
     Function DeleteCar(id As Integer) As ActionResult
+        Try
+            Dim uom As New UnitOfWork
 
-        Dim uom As New UnitOfWork
+            uom.BeginTransaction()
 
-        uom.BeginTransaction()
+            If (id > 0) Then
+                Dim car = uom.Repository(Of Car).GetAll().Where(Function(e) e.Id = id).FirstOrDefault()
+                uom.Repository(Of Car).Delete(car)
+            End If
 
-        If (id > 0) Then
-            Dim car = uom.Repository(Of Car).GetAll().Where(Function(e) e.Id = id).FirstOrDefault()
-            uom.Repository(Of Car).Delete(car)
-        End If
+            uom.SaveChanges()
 
-        uom.SaveChanges()
+            uom.CommitTransaction()
 
-        uom.CommitTransaction()
+            Return Json(True)
 
-        Return Json(True)
+        Catch ex As Exception
+            log.Error(ex)
+        End Try
+
+        Return Json(False)
+
     End Function
 
     Function About() As ActionResult
